@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연봉 정보 — 채용</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: #f4f5f7;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── GNB ── */
+    .gnb {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .gnb-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      color: #111;
+      letter-spacing: -0.5px;
+      cursor: pointer;
+    }
+    .logo span { color: #3182f6; }
+    .gnb-menu {
+      display: flex;
+      gap: 28px;
+      flex: 1;
+    }
+    .gnb-menu a {
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .gnb-menu a.active { color: #111; font-weight: 700; }
+    .gnb-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-login {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 7px 16px;
+      cursor: pointer;
+    }
+    .btn-signup {
+      font-size: 13px;
+      font-weight: 700;
+      color: #222;
+      background: #ffd644;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 16px;
+      cursor: pointer;
+    }
+    .btn-signup:hover { background: #f0c830; }
+
+    /* ── 페이지 헤더 ── */
+    .page-header {
+      background: #1e1e1e;
+      padding: 48px 32px;
+    }
+    .page-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: #888;
+    }
+
+    /* 요약 스탯 */
+    .stat-row {
+      display: flex;
+      gap: 32px;
+    }
+    .stat-item { text-align: right; }
+    .stat-label { font-size: 12px; color: #777; margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 800; color: #ffd644; letter-spacing: -0.5px; }
+    .stat-unit  { font-size: 14px; font-weight: 500; color: #ffd644; }
+    .stat-divider { width: 1px; background: #333; align-self: stretch; }
+
+    /* ── 메인 레이아웃 ── */
+    .main-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 32px 60px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    /* ── 사이드바 ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+    }
+    .sidebar-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 14px;
+    }
+    .filter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #555;
+      transition: background 0.1s;
+    }
+    .filter-item:hover { background: #f7f8fa; }
+    .filter-item.active {
+      background: #eef4ff;
+      color: #3182f6;
+      font-weight: 600;
+    }
+    .filter-count {
+      font-size: 11px;
+      color: #bbb;
+      background: #f3f4f6;
+      border-radius: 10px;
+      padding: 1px 7px;
+    }
+    .filter-item.active .filter-count {
+      background: #d0e4ff;
+      color: #3182f6;
+    }
+
+    /* 연봉 범위 슬라이더 */
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+    .range-track {
+      height: 4px;
+      background: #e8e8e8;
+      border-radius: 2px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .range-fill {
+      position: absolute;
+      height: 100%;
+      background: #3182f6;
+      border-radius: 2px;
+      left: 0;
+      width: 70%;
+    }
+    .range-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+      text-align: center;
+    }
+
+    /* ── 컨텐츠 영역 ── */
+    .content { flex: 1; min-width: 0; }
+
+    /* 검색 + 정렬 바 */
+    .content-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .search-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      gap: 10px;
+    }
+    .search-bar svg { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
+    .search-bar input {
+      border: none;
+      background: transparent;
+      flex: 1;
+      font-size: 14px;
+      outline: none;
+      color: #333;
+    }
+    .search-bar input::placeholder { color: #bbb; }
+    .sort-select {
+      font-size: 13px;
+      color: #555;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* 탭 */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #555;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: #1e1e1e;
+      color: #fff;
+      border-color: #1e1e1e;
+    }
+    .tab:hover:not(.active) { background: #f7f8fa; }
+
+    /* 리스트 헤더 */
+    .list-meta {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .list-meta strong { color: #333; font-weight: 600; }
+
+    /* 카드 그리드 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    /* 연봉 카드 */
+    .salary-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #eee;
+      padding: 20px;
+      transition: box-shadow 0.15s, transform 0.15s;
+      cursor: pointer;
+    }
+    .salary-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .job-info { display: flex; flex-direction: column; gap: 4px; }
+    .job-title { font-size: 16px; font-weight: 700; color: #111; }
+    .job-sub { font-size: 12px; color: #999; }
+
+    .salary-avg { text-align: right; }
+    .avg-label { font-size: 10px; color: #aaa; margin-bottom: 3px; }
+    .avg-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: #3182f6;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .avg-unit { font-size: 13px; font-weight: 500; color: #3182f6; }
+
+    /* 연봉 범위 바 */
+    .salary-bar-wrap { margin-bottom: 12px; }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #bbb;
+      margin-bottom: 5px;
+    }
+    .bar-track {
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 3px;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #74b3ff, #3182f6);
+      position: absolute;
+    }
+    .bar-avg-marker {
+      position: absolute;
+      top: -3px;
+      width: 12px;
+      height: 12px;
+      background: #3182f6;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(49,130,246,0.4);
+      transform: translateX(-50%);
+    }
+
+    /* 경력별 */
+    .career-table {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .career-item {
+      background: #f7f8fa;
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .career-label { font-size: 10px; color: #aaa; margin-bottom: 4px; }
+    .career-value { font-size: 12px; font-weight: 700; color: #333; }
+
+    /* 태그 */
+    .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #f3f4f6;
+      color: #666;
+    }
+    .tag.hot { background: #fff0f0; color: #e25050; }
+    .tag.up  { background: #edfaf3; color: #2eb87a; }
+
+    /* 인기 뱃지 */
+    .hot-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #e25050;
+      background: #fff0f0;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GNB -->
+  <nav class="gnb">
+    <div class="gnb-inner">
+      <div class="logo">JOB<span>.</span></div>
+      <div class="gnb-menu">
+        <a href="#">채용 공고</a>
+        <a href="#" class="active">연봉 정보</a>
+        <a href="#">기업 리뷰</a>
+        <a href="#">커리어 가이드</a>
+      </div>
+      <div class="gnb-right">
+        <button class="btn-login">로그인</button>
+        <button class="btn-signup">회원가입</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 페이지 헤더 -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1>연봉 정보</h1>
+        <p>직무별 평균 연봉과 경력별 연봉 범위를 확인해보세요</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-label">IT 직군 평균</div>
+          <div class="stat-value">5,240<span class="stat-unit">만원</span></div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-label">신입 평균</div>
+          <div class="stat-value">3,800<span class="stat-unit">만원</span></div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-label">5년↑ 평균</div>
+          <div class="stat-value">7,100<span class="stat-unit">만원</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-wrap">
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">직군</div>
+        <div class="filter-list">
+          <div class="filter-item active">전체 <span class="filter-count">24</span></div>
+          <div class="filter-item">개발 <span class="filter-count">12</span></div>
+          <div class="filter-item">데이터 <span class="filter-count">4</span></div>
+          <div class="filter-item">디자인 <span class="filter-count">3</span></div>
+          <div class="filter-item">기획/PM <span class="filter-count">3</span></div>
+          <div class="filter-item">마케팅 <span class="filter-count">2</span></div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">경력</div>
+        <div class="filter-list">
+          <div class="filter-item active">전체 <span class="filter-count"></span></div>
+          <div class="filter-item">신입 <span class="filter-count"></span></div>
+          <div class="filter-item">1~3년 <span class="filter-count"></span></div>
+          <div class="filter-item">3~5년 <span class="filter-count"></span></div>
+          <div class="filter-item">5년↑ <span class="filter-count"></span></div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">연봉 범위</div>
+        <div class="range-labels"><span>0만원</span><span>1.5억</span></div>
+        <div class="range-track">
+          <div class="range-fill"></div>
+        </div>
+        <div class="range-value">~ 1억 500만원</div>
+      </div>
+    </aside>
+
+    <!-- 컨텐츠 -->
+    <div class="content">
+
+      <!-- 검색 + 정렬 -->
+      <div class="content-bar">
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="직무, 기술 스택 검색 (예: React, Spring, ML)">
+        </div>
+        <select class="sort-select">
+          <option>평균 연봉 높은순</option>
+          <option>평균 연봉 낮은순</option>
+          <option>연봉 상승률순</option>
+          <option>최고 연봉순</option>
+        </select>
+      </div>
+
+      <!-- 탭 -->
+      <div class="tabs">
+        <div class="tab active">전체</div>
+        <div class="tab">개발</div>
+        <div class="tab">디자인</div>
+        <div class="tab">데이터</div>
+        <div class="tab">기획/PM</div>
+        <div class="tab">마케팅</div>
+      </div>
+
+      <div class="list-meta">전체 <strong>24개</strong> 직무</div>
+
+      <!-- 카드 그리드 -->
+      <div class="card-grid">
+
+        <div class="salary-card">
+          <div class="hot-badge">🔥 인기 급상승</div>
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">AI/ML 엔지니어</div>
+              <div class="job-sub">인공지능 · 머신러닝</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">7,800<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 4,500만</span><span>최고 1.4억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:15%;width:55%;"></div>
+              <div class="bar-avg-marker" style="left:42%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">4,800만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">7,200만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">9,500만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">1.3억↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag up">↑ +12%</span>
+            <span class="tag">PyTorch</span>
+            <span class="tag">LLM</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">DevOps / SRE</div>
+              <div class="job-sub">인프라 · 클라우드</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">7,200<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 4,000만</span><span>최고 1.2억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:12%;width:52%;"></div>
+              <div class="bar-avg-marker" style="left:40%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">4,200만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">6,800만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">8,800만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">1.1억↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag up">↑ +9%</span>
+            <span class="tag">AWS</span>
+            <span class="tag">Kubernetes</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">iOS 개발자</div>
+              <div class="job-sub">모바일 · Swift</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">6,800<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,800만</span><span>최고 1.1억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:10%;width:54%;"></div>
+              <div class="bar-avg-marker" style="left:38%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,800만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">6,200만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">8,200만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">1.0억↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Swift</span>
+            <span class="tag">SwiftUI</span>
+            <span class="tag">RxSwift</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">백엔드 개발자</div>
+              <div class="job-sub">서버 · API</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">6,400<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,500만</span><span>최고 1.1억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:9%;width:52%;"></div>
+              <div class="bar-avg-marker" style="left:36%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,800만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">5,800만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">7,800만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">1.0억↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Java</span>
+            <span class="tag">Spring</span>
+            <span class="tag">Kotlin</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">프론트엔드 개발자</div>
+              <div class="job-sub">웹 · UI</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">6,100<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,200만</span><span>최고 1.0억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:8%;width:50%;"></div>
+              <div class="bar-avg-marker" style="left:34%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,500만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">5,500만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">7,400만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">9,500만↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">React</span>
+            <span class="tag">Next.js</span>
+            <span class="tag">TypeScript</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">데이터 엔지니어</div>
+              <div class="job-sub">파이프라인 · 분석</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">6,000<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,500만</span><span>최고 9,500만</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:10%;width:50%;"></div>
+              <div class="bar-avg-marker" style="left:35%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,600만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">5,600만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">7,200만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">9,000만↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">Spark</span>
+            <span class="tag">Airflow</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">UX/UI 디자이너</div>
+              <div class="job-sub">제품 디자인</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">5,200<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,000만</span><span>최고 8,500만</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:8%;width:48%;"></div>
+              <div class="bar-avg-marker" style="left:32%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,200만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">4,800만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">6,400만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">8,000만↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Figma</span>
+            <span class="tag">UX Research</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">서비스 기획자 / PM</div>
+              <div class="job-sub">프로덕트 매니지먼트</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">5,000<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,000만</span><span>최고 9,000만</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:8%;width:46%;"></div>
+              <div class="bar-avg-marker" style="left:30%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,200만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">4,800만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">6,200만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">8,500만↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Agile</span>
+            <span class="tag">JIRA</span>
+            <span class="tag">데이터 분석</span>
+          </div>
+        </div>
+
+        <div class="salary-card">
+          <div class="card-top">
+            <div class="job-info">
+              <div class="job-title">Android 개발자</div>
+              <div class="job-sub">모바일 · Kotlin</div>
+            </div>
+            <div class="salary-avg">
+              <div class="avg-label">평균 연봉</div>
+              <div class="avg-value">6,500<span class="avg-unit">만원</span></div>
+            </div>
+          </div>
+          <div class="salary-bar-wrap">
+            <div class="bar-labels"><span>최저 3,600만</span><span>최고 1.1억</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="left:10%;width:51%;"></div>
+              <div class="bar-avg-marker" style="left:37%;"></div>
+            </div>
+          </div>
+          <div class="career-table">
+            <div class="career-item"><div class="career-label">신입</div><div class="career-value">3,600만</div></div>
+            <div class="career-item"><div class="career-label">3년차</div><div class="career-value">6,000만</div></div>
+            <div class="career-item"><div class="career-label">5년차</div><div class="career-value">8,000만</div></div>
+            <div class="career-item"><div class="career-label">10년↑</div><div class="career-value">1.0억↑</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Kotlin</span>
+            <span class="tag">Jetpack Compose</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 탭 전환
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+    // 사이드바 필터
+    document.querySelectorAll('.filter-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.closest('.filter-list').querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
