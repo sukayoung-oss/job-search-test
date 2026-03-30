@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>회원가입</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background-color: #f4f5f7;
+      max-width: 390px;
+      margin: 0 auto;
+      min-height: 100vh;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 헤더 ── */
+    .header {
+      background: #fff;
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e8e8e8;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-back {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: -6px;
+    }
+    .header-back svg { width: 20px; height: 20px; color: #333; }
+    .header-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #111;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* ── 컨텐츠 ── */
+    .content {
+      padding: 24px 16px 100px;
+    }
+
+    /* ── 섹션 타이틀 ── */
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      margin-top: 24px;
+    }
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    /* ── 입력 그룹 ── */
+    .input-group {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      overflow: hidden;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      min-height: 52px;
+      border-bottom: 1px solid #f2f3f5;
+    }
+    .input-row:last-child {
+      border-bottom: none;
+    }
+    .input-row label {
+      font-size: 13px;
+      color: #555;
+      white-space: nowrap;
+      width: 68px;
+      flex-shrink: 0;
+    }
+    .input-row input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #222;
+      background: transparent;
+      min-width: 0;
+    }
+    .input-row input::placeholder { color: #ccc; }
+
+    /* 인증 버튼이 있는 행 */
+    .input-row .verify-btn {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #3182f6;
+      background: #e7f0ff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .input-row .verify-btn:active { background: #d0e4ff; }
+
+    /* 비밀번호 토글 */
+    .pw-toggle {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #bbb;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+    .pw-toggle svg { width: 18px; height: 18px; }
+
+    /* ── 힌트 텍스트 ── */
+    .hint {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 6px;
+      padding: 0 4px;
+    }
+    .hint.error { color: #e25050; }
+    .hint.ok { color: #2eb87a; }
+
+    /* ── 약관 동의 ── */
+    .agree-group {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      overflow: hidden;
+    }
+    .agree-row {
+      display: flex;
+      align-items: center;
+      padding: 13px 14px;
+      gap: 10px;
+      border-bottom: 1px solid #f2f3f5;
+      cursor: pointer;
+    }
+    .agree-row:last-child { border-bottom: none; }
+    .agree-row.all-agree {
+      background: #fafafa;
+    }
+    .agree-row.all-agree .agree-label {
+      font-weight: 700;
+      color: #222;
+    }
+
+    /* 커스텀 체크박스 */
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .checkbox.checked {
+      background: #3182f6;
+      border-color: #3182f6;
+    }
+    .checkbox svg {
+      width: 11px;
+      height: 11px;
+      color: #fff;
+      display: none;
+    }
+    .checkbox.checked svg { display: block; }
+
+    .agree-label {
+      flex: 1;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+    }
+    .agree-label .required {
+      color: #3182f6;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 3px;
+    }
+    .agree-label .optional {
+      color: #aaa;
+      font-size: 11px;
+      margin-right: 3px;
+    }
+    .agree-arrow {
+      color: #ccc;
+      flex-shrink: 0;
+    }
+    .agree-arrow svg { width: 14px; height: 14px; }
+
+    /* ── 하단 버튼 ── */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 390px;
+      padding: 10px 16px 14px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      z-index: 100;
+    }
+    .cta {
+      width: 100%;
+      padding: 14px 0;
+      background: #ffd644;
+      color: #222;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .cta:active { background: #f0c830; }
+    .cta:disabled {
+      background: #f0f0f0;
+      color: #bbb;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="header-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </div>
+    <span class="header-title">회원가입</span>
+  </div>
+
+  <div class="content">
+
+    <!-- 기본 정보 -->
+    <div class="section-title">기본 정보</div>
+    <div class="input-group">
+      <div class="input-row">
+        <label for="name">이름</label>
+        <input id="name" type="text" placeholder="실명을 입력해주세요" autocomplete="name">
+      </div>
+      <div class="input-row">
+        <label for="birth">생년월일</label>
+        <input id="birth" type="text" placeholder="YYYYMMDD" maxlength="8" inputmode="numeric">
+      </div>
+    </div>
+
+    <!-- 계정 정보 -->
+    <div class="section-title">계정 정보</div>
+    <div class="input-group">
+      <div class="input-row">
+        <label for="email">이메일</label>
+        <input id="email" type="email" placeholder="이메일 주소" autocomplete="email" inputmode="email">
+      </div>
+      <div class="input-row">
+        <label for="password">비밀번호</label>
+        <input id="password" type="password" placeholder="영문+숫자 8자 이상" autocomplete="new-password">
+        <button class="pw-toggle" onclick="togglePw('password', this)" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-row">
+        <label for="pw-confirm">비밀번호 확인</label>
+        <input id="pw-confirm" type="password" placeholder="비밀번호 재입력" autocomplete="new-password">
+        <button class="pw-toggle" onclick="togglePw('pw-confirm', this)" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <p class="hint" id="pw-hint"></p>
+
+    <!-- 휴대폰 인증 -->
+    <div class="section-title">휴대폰 인증</div>
+    <div class="input-group">
+      <div class="input-row">
+        <label for="phone">휴대폰</label>
+        <input id="phone" type="tel" placeholder="010-0000-0000" inputmode="tel" maxlength="13">
+        <button class="verify-btn" id="send-btn" onclick="sendCode()">인증 요청</button>
+      </div>
+      <div class="input-row" id="code-row" style="display:none;">
+        <label for="code">인증번호</label>
+        <input id="code" type="text" placeholder="6자리 입력" inputmode="numeric" maxlength="6">
+        <span id="timer" style="font-size:12px;color:#e25050;flex-shrink:0;">3:00</span>
+      </div>
+    </div>
+
+    <!-- 약관 동의 -->
+    <div class="section-title">약관 동의</div>
+    <div class="agree-group">
+      <div class="agree-row all-agree" onclick="toggleAll()">
+        <div class="checkbox" id="chk-all">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2,6 5,9 10,3"/>
+          </svg>
+        </div>
+        <span class="agree-label">전체 동의</span>
+      </div>
+      <div class="agree-row" onclick="toggleChk('chk-1')">
+        <div class="checkbox" id="chk-1">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2,6 5,9 10,3"/>
+          </svg>
+        </div>
+        <span class="agree-label"><span class="required">[필수]</span>서비스 이용약관 동의</span>
+        <span class="agree-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </div>
+      <div class="agree-row" onclick="toggleChk('chk-2')">
+        <div class="checkbox" id="chk-2">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2,6 5,9 10,3"/>
+          </svg>
+        </div>
+        <span class="agree-label"><span class="required">[필수]</span>개인정보 수집·이용 동의</span>
+        <span class="agree-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </div>
+      <div class="agree-row" onclick="toggleChk('chk-3')">
+        <div class="checkbox" id="chk-3">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2,6 5,9 10,3"/>
+          </svg>
+        </div>
+        <span class="agree-label"><span class="optional">[선택]</span>마케팅 정보 수신 동의</span>
+        <span class="agree-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 하단 버튼 -->
+  <div class="bottom-bar">
+    <button class="cta" id="submit-btn" onclick="submitSignup()">가입 완료</button>
+  </div>
+
+<script>
+  // ── 비밀번호 표시/숨기기 ──
+  function togglePw(id, btn) {
+    const input = document.getElementById(id);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.style.color = isText ? '#bbb' : '#3182f6';
+  }
+
+  // ── 비밀번호 확인 힌트 ──
+  const pwInput = document.getElementById('password');
+  const pwConfirm = document.getElementById('pw-confirm');
+  const pwHint = document.getElementById('pw-hint');
+
+  function checkPw() {
+    const pw = pwInput.value;
+    const confirm = pwConfirm.value;
+    if (!confirm) { pwHint.textContent = ''; pwHint.className = 'hint'; return; }
+    if (pw === confirm) {
+      pwHint.textContent = '비밀번호가 일치합니다.';
+      pwHint.className = 'hint ok';
+    } else {
+      pwHint.textContent = '비밀번호가 일치하지 않습니다.';
+      pwHint.className = 'hint error';
+    }
+  }
+  pwInput.addEventListener('input', checkPw);
+  pwConfirm.addEventListener('input', checkPw);
+
+  // ── 휴대폰 번호 자동 하이픈 ──
+  document.getElementById('phone').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length > 7) v = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7);
+    else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+    this.value = v;
+  });
+
+  // ── 인증번호 발송 & 타이머 ──
+  let timerInterval = null;
+  function sendCode() {
+    const phone = document.getElementById('phone').value.replace(/\D/g, '');
+    if (phone.length < 10) { alert('휴대폰 번호를 올바르게 입력해주세요.'); return; }
+    document.getElementById('code-row').style.display = 'flex';
+    document.getElementById('send-btn').textContent = '재발송';
+    startTimer(180);
+  }
+  function startTimer(seconds) {
+    clearInterval(timerInterval);
+    const timerEl = document.getElementById('timer');
+    let remaining = seconds;
+    timerEl.textContent = formatTime(remaining);
+    timerInterval = setInterval(() => {
+      remaining--;
+      timerEl.textContent = formatTime(remaining);
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        timerEl.textContent = '만료';
+      }
+    }, 1000);
+  }
+  function formatTime(s) {
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  // ── 약관 체크박스 ──
+  const required = ['chk-1', 'chk-2'];
+  const optional = ['chk-3'];
+  const allItems = [...required, ...optional];
+
+  function toggleChk(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('checked');
+    syncAllChk();
+  }
+  function toggleAll() {
+    const allChecked = allItems.every(id => document.getElementById(id).classList.contains('checked'));
+    allItems.forEach(id => {
+      const el = document.getElementById(id);
+      allChecked ? el.classList.remove('checked') : el.classList.add('checked');
+    });
+    syncAllChk();
+  }
+  function syncAllChk() {
+    const allChecked = allItems.every(id => document.getElementById(id).classList.contains('checked'));
+    const allEl = document.getElementById('chk-all');
+    allChecked ? allEl.classList.add('checked') : allEl.classList.remove('checked');
+  }
+
+  // ── 제출 ──
+  function submitSignup() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pw = document.getElementById('password').value;
+    const pwC = document.getElementById('pw-confirm').value;
+    const reqChecked = required.every(id => document.getElementById(id).classList.contains('checked'));
+
+    if (!name) { alert('이름을 입력해주세요.'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('올바른 이메일을 입력해주세요.'); return; }
+    if (pw.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+    if (pw !== pwC) { alert('비밀번호가 일치하지 않습니다.'); return; }
+    if (!reqChecked) { alert('필수 약관에 동의해주세요.'); return; }
+
+    alert('회원가입이 완료되었습니다!');
+  }
+</script>
+</body>
+</html>
