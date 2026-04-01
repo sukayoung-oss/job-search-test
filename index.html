@@ -30,9 +30,9 @@
       z-index: 100;
     }
     .gnb-inner {
-      max-width: 1200px;
+      max-width: 1920px;
       margin: 0 auto;
-      padding: 0 32px;
+      padding: 0 48px;
       height: 100%;
       display: flex;
       align-items: center;
@@ -89,10 +89,10 @@
     /* ── 페이지 헤더 ── */
     .page-header {
       background: #1e1e1e;
-      padding: 48px 32px;
+      padding: 48px 48px;
     }
     .page-header-inner {
-      max-width: 1200px;
+      max-width: 1920px;
       margin: 0 auto;
       display: flex;
       align-items: flex-end;
@@ -124,9 +124,9 @@
 
     /* ── 메인 레이아웃 ── */
     .main-wrap {
-      max-width: 1200px;
+      max-width: 1920px;
       margin: 0 auto;
-      padding: 32px 32px 60px;
+      padding: 32px 48px 60px;
       display: flex;
       gap: 28px;
       align-items: flex-start;
@@ -134,7 +134,7 @@
 
     /* ── 사이드바 ── */
     .sidebar {
-      width: 220px;
+      width: 260px;
       flex-shrink: 0;
       position: sticky;
       top: 80px;
@@ -293,7 +293,7 @@
     /* 카드 그리드 */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
     }
 
